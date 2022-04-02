@@ -16,13 +16,16 @@
 subdir('data')
 subdir('param')
 
+if get_option('ilp64')
+  srcs += files('blas64.f90', 'lapack64.f90')
+else
+  srcs += files('blas.f90', 'lapack.f90')
+endif
 srcs += files(
-  'blas.f90',
   'cutoff.f90',
   'data.f90',
   'ewald.f90',
-  'lapack.f90',
-  'model.f90',
+  'model.F90',
   'ncoord.f90',
   'output.f90',
   'param.f90',
