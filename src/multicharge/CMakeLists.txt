@@ -30,7 +30,7 @@ list(
   "${dir}/cutoff.f90"
   "${dir}/data.f90"
   "${dir}/ewald.f90"
-  "${dir}/model.f90"
+  "${dir}/model.F90"
   "${dir}/ncoord.f90"
   "${dir}/output.f90"
   "${dir}/param.f90"
