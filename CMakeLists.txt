@@ -33,8 +33,21 @@ if(NOT TARGET "OpenMP::OpenMP_Fortran" AND WITH_OpenMP)
   find_package("OpenMP" REQUIRED)
 endif()
 
-if(NOT TARGET "LAPACK::LAPACK")
-  find_package("custom-lapack" REQUIRED)
+if(WITH_ILP64)
+  add_definitions(-DWITH_ILP64)
+  if(ENABLE_AUTO_LAPACK)
+    set(BLA_SIZEOF_INTEGER 8)
+  endif()
+endif()
+
+if(LAPACK_LIBRARIES)
+  message(STATUS "LAPACK supplied by user is ${LAPACK_LIBRARIES}")
+endif()
+
+if(ENABLE_AUTO_LAPACK)
+  if(NOT TARGET "LAPACK::LAPACK")
+    find_package("custom-lapack" REQUIRED)
+  endif()
 endif()
 
 # Collect subprojects
@@ -50,6 +63,22 @@ set(
   lib-deps
   "mctc-lib::mctc-lib"
 )
+
+
+if(NOT ENABLE_AUTO_LAPACK)
+  set(
+    lib-deps
+    ${lib-deps}
+    ${LAPACK_LIBRARIES}
+    )
+else()
+  set(
+    lib-deps
+    ${lib-deps}
+    "LAPACK::LAPACK"
+    "$<$<VERSION_LESS:${CMAKE_VERSION},3.20>:BLAS::BLAS>"
+    )
+endif()
 
 # Collect source of the project
 set(srcs)
@@ -69,12 +98,12 @@ set_target_properties(
   SOVERSION "${PROJECT_VERSION_MAJOR}"
   Fortran_MODULE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/include"
 )
+
+
 target_link_libraries(
   "${PROJECT_NAME}-lib"
   PUBLIC
   "${lib-deps}"
-  "LAPACK::LAPACK"
-  "$<$<VERSION_LESS:${CMAKE_VERSION},3.20>:BLAS::BLAS>"
 )
 if(WITH_OpenMP)
   target_link_libraries(
