@@ -56,7 +56,7 @@ if(NOT TARGET "mctc-lib::mctc-lib")
   find_package("mctc-lib" REQUIRED)
 endif()
 
-if(NOT TARGET "mstore::mstore")
+if(NOT TARGET "mstore::mstore" AND WITH_TESTS)
   find_package("mstore")
 endif()
 
@@ -122,7 +122,9 @@ target_include_directories(
 )
 
 # Add example application
-add_subdirectory("app")
+if(WITH_APP)
+  add_subdirectory("app")
+endif()
 
 # Export targets for other projects
 add_library("${PROJECT_NAME}" INTERFACE)
@@ -156,5 +158,7 @@ install(
 )
 
 # add the testsuite
-enable_testing()
-add_subdirectory("test")
+if(WITH_TESTS)
+  enable_testing()
+  add_subdirectory("test")
+endif()
